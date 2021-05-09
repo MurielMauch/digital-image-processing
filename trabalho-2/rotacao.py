@@ -23,7 +23,7 @@ for image in images:
 
     image_handler.add_img_to_plot(t_magnitude_spectrum, 'Translated Image Magnitude Spectrum', 1, 4, 4)
 
-    # image_handler.plot_images()
+    image_handler.plot_images()
 
     cv2.imwrite(f'images/outputs/rotacao/{image}-original.png', original_img)
     cv2.imwrite(f'images/outputs/rotacao/{image}-espectro-magnitude.png', magnitude_spectrum)

@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 class HandlingImages:
     def __init__(self):
-        self.images_to_plot = ['baboon', 'butterfly', 'city', 'house', 'seagull']
+        self.images_to_plot = ['baboon', 'butterfly', 'seagull']
         self.plot = plt
         self.row, self.column = None, None
 
@@ -33,10 +33,10 @@ class HandlingImages:
 
         return magnitude_spectrum, dft_shift
 
-    def apply_inverse_fourier(self, dft_shift):
+    def apply_inverse_fourier(self, dft_shift, min=0, max=255):
         f_ishift = np.fft.ifftshift(dft_shift)
         img_back = cv2.idft(f_ishift)
-        img_back = cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1])
-        norm_image = cv2.normalize(img_back, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F).astype(np.uint8)
+        img_back = np.abs(cv2.magnitude(img_back[:, :, 0], img_back[:, :, 1]))
+        norm_image = cv2.normalize(img_back, None, alpha=min, beta=max, norm_type=cv2.NORM_MINMAX, dtype=cv2.DFT_COMPLEX_OUTPUT).astype(np.uint8)
 
         return norm_image

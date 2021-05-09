@@ -10,6 +10,8 @@ for image in images:
     for radius in range(10, 21, 2):
         original_img = cv2.imread(f'images/input/{image}.png', 0)
         image_handler.add_img_to_plot(original_img, 'Original Image', 1, 4, 1)
+        original_img_min = original_img.min()
+        original_img_max = original_img.max()
 
         magnitude_spectrum, dft_shift = image_handler.apply_fourier(original_img)
         image_handler.add_img_to_plot(magnitude_spectrum, 'Espectro de magnitude', 1, 4, 2)
@@ -32,14 +34,14 @@ for image in images:
         mask = cv2.circle(mask, img_center, radius, (0, 0, 0), -1)
 
         fshift = dft_shift * mask
-        img_back = image_handler.apply_inverse_fourier(fshift)
+        img_back = image_handler.apply_inverse_fourier(fshift, original_img_min, original_img_max)
         image_handler.add_img_to_plot(img_back, 'Imagem com máscara', 1, 4, 4)
 
-        # image_handler.plot_images()
+        image_handler.plot_images()
 
-        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-original-{outer_radius}.png', original_img)
-        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-espectro-magnitude-{outer_radius}.png',
+        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-1-original-{outer_radius}.png', original_img)
+        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-2-espectro-magnitude-{outer_radius}.png',
                     magnitude_spectrum)
-        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-espectro-magnitude-com-mascara-{outer_radius}.png',
+        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-3-espectro-magnitude-com-mascara-{outer_radius}.png',
                     espectro_com_mascara)
-        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-inversa.png-{outer_radius}', img_back)
+        cv2.imwrite(f'images/outputs/passa_faixa/{image}/{radius}-4-inversa.png-{outer_radius}', img_back)
