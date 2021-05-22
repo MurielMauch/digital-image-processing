@@ -16,5 +16,9 @@ pip3 install -r requirements.txt
 The last step is to actually run the script:
 
 ```
-python3 trabalho-1.py
+python3 main.py baboon.png h1 mono
+python3 main.py baboon.png h2 mono
+python3 main.py baboon.png h1_and_h2 mono
+python3 main.py baboon.png 1a colored
+...
 ```

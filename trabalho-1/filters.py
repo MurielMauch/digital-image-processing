@@ -97,7 +97,12 @@ def apply_filters_h1_and_h2(img, height, width):
             for i in range(0, 9):
                 result += sqrt(((pixel_list[i] * filter_h1[i]) ** 2) + ((pixel_list[i] * filter_h2[i]) ** 2))
 
-            filter_result = result
+            if result <= 0:
+                filter_result = 0
+            elif result >= 255:
+                filter_result = 255
+            else:
+                filter_result = result
 
             new_image[column][line] = filter_result  # 1/1
 
@@ -411,6 +416,7 @@ def apply_filter_h9(img, h, w):
 
 
 def apply_filter_1a(img):
+    print('Applying filter 1a')
     for entry in img:
         for pixel in entry:
             pixel[0] = 0.393*pixel[0] + 0.769*pixel[1] + 0.189*pixel[2] if 0.393*pixel[0] + 0.769*pixel[1] + 0.189*pixel[2] < 255 else 255
@@ -420,12 +426,13 @@ def apply_filter_1a(img):
 
 
 def apply_filter_1b(img):
-    for entry in img:
-        for pixel in entry:
-            pixel[0] = 0.2989*pixel[0] + 0.5870*pixel[1] + 0.1140*pixel[2]
-            pixel[1] = 0.2989*pixel[0] + 0.5870*pixel[1] + 0.1140*pixel[2]
-            pixel[2] = 0.2989*pixel[0] + 0.5870*pixel[1] + 0.1140*pixel[2]
-        return img
+    print('Applying filter 1b')
+    lines, columns, entries = img.shape
+    new_image = np.zeros(shape=(lines, columns))
 
+    for line in range(lines):
+        for column in range(columns):
+            new_value = (0.2989*(img[line][column][0])) + (0.5870*(img[line][column][1])) + (0.1140*(img[line][column][2]))
+            new_image[line][column] = new_value
 
-
+    return new_image
