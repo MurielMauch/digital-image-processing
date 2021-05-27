@@ -21,6 +21,8 @@ contornos_numerados = np.ones((canny_output.shape[0], canny_output.shape[1], 3),
 pequena = 0
 media = 0
 grande = 0
+areas = []
+
 for i in range(len(contours)):
     contorno = contours[i]
     area = cv2.contourArea(contorno)
@@ -30,11 +32,12 @@ for i in range(len(contours)):
         media += 1
     elif area > 3000:
         grande += 1
+    areas.append(area)
     perimetro = cv2.arcLength(contorno, True)
 
     hull = cv2.convexHull(contorno)
     hull_area = cv2.contourArea(hull)
-    solidez = float(area) / hull_area
+    solidez = area / hull_area
 
     # compute the center of the contour
     M = cv2.moments(contorno)
@@ -45,10 +48,18 @@ for i in range(len(contours)):
 
     cv2.drawContours(contornos_numerados, contours[i], -1, [0, 0, 0], 1, cv2.LINE_8)
     cv2.circle(contornos_numerados, (cX, cY), 7, (255, 255, 255), -1)
-    cv2.putText(contornos_numerados, f"{i}", (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+    cv2.putText(contornos_numerados, f"{i}", (cX - 2, cY + 2), cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5,
+                color=(255, 0, 0), thickness=1)
+
+    elipse = cv2.fitEllipse(contorno)
+    centro, eixo, orientacao = elipse
+
+    eixo_a = max(eixo)
+    eixo_b = min(eixo)
+    excentricidade = np.sqrt(1 - (eixo_b / eixo_a) ** 2)
 
     print(
-        f'Região f{i}: área: {area} perimetro: {perimetro} excentricidade: {0} solidez: {solidez} centro: ({cX},{cY})')
+        f'Região {i}: área: {area} perimetro: {perimetro:.2f} excentricidade: {excentricidade:.2f} solidez: {solidez} centro: ({cX},{cY})')
 
 # plt.imshow(desenho_contornos, cmap='gray')
 # plt.show()
@@ -58,6 +69,6 @@ for i in range(len(contours)):
 
 print(f'Numero de regioes pequenas: {pequena}\nNumero de regioes medias: {media}\nNumero de regioes grandes: {grande}')
 
-histograma = np.histogram([pequena, media, grande])
-plt.hist(histograma)
+entradas = np.array(areas)
+plt.hist(entradas, bins=[0, 1500, 3000, 4500])
 plt.show()
