@@ -62,26 +62,26 @@ for image in ['objetos1', 'objetos2', 'objetos3']:
         area_hull = cv2.contourArea(hull_convexo)
         solidez = area / area_hull
 
-        # encontrando o centro da imagem
-        M = cv2.moments(contorno)
-        c_x = int(M["m10"] / M["m00"])
-        c_y = int(M["m01"] / M["m00"])
-
         # desenhando os contornos
         cv2.drawContours(desenho_contornos, contornos, i, [255, 0, 0], 1, cv2.LINE_8, hierarchy, 0)
 
-        # numerando os contornos
-        cv2.drawContours(contornos_numerados, contornos[i], -1, [0, 0, 0], 1, cv2.LINE_8)
-        cv2.circle(contornos_numerados, (c_x, c_y), 7, (255, 255, 255), -1)
-        cv2.putText(original_img, f"{i}", (c_x, c_y), cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5,
-                    color=(0, 0, 0), thickness=1)
-
         # calculando exentricidade
         elipse = cv2.fitEllipse(contorno)
-        centro, eixo, orientacao = elipse
-        eixo_a = max(eixo)
-        eixo_b = min(eixo)
-        excentricidade = np.sqrt(1 - (eixo_b / eixo_a) ** 2)
+
+        # coordenadas do centro, eixos da elipse e angulo da orientacao
+        (x, y), (eixo_a, eixo_b), angle = cv2.fitEllipse(contorno)
+        x, y = round(x), round(y)
+        a = eixo_b / 2
+        b = eixo_a / 2
+        excentricidade = np.sqrt(pow(a, 2) - pow(b, 2))
+        excentricidade = round(excentricidade / a, 2)
+
+        # numerando os contornos
+        cv2.drawContours(contornos_numerados, contornos[i], -1, [0, 0, 0], 1, cv2.LINE_8)
+        cv2.circle(contornos_numerados, (x, y), 7, (255, 255, 255), -1)
+        cv2.putText(original_img, f"{i}", (x, y), cv2.FONT_HERSHEY_PLAIN, fontScale=1,
+                    color=(0, 0, 0), thickness=1)
+
 
         print(
             f'Região {i}: área: {area} perimetro: {perimetro:.7f} excentricidade: {excentricidade:.7f} solidez: {solidez:.7f}')
