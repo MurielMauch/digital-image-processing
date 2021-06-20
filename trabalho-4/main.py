@@ -42,18 +42,20 @@ for nome_imagem in imagens:
 
     # calculando a glcm
     # 0 graus, 45 graus, 90 graus
-    angulos = [0, np.pi / 4, np.pi / 2]
+    angulos = [0]
+    props = ['dissimilarity', 'contrast', 'ASM']
     glcm = greycomatrix(img_as_ubyte(imagem_monocromatica_normalizada),
                         distances=[1], angles=angulos, symmetric=True, normed=True)
-
-    aux = greycoprops(glcm, 'contrast').tolist()[0]
-    aux.insert(0, nome_imagem)
+    aux = []  # noqa
+    aux.append(nome_imagem)
+    for prop in props:
+        aux.append(greycoprops(glcm, prop)[0][0])
     constrastes.append(aux)
     plt.clf()
 
 print('Contraste')
 y = PrettyTable()
-y.field_names = ['nome da imagem', '0 graus', '45 graus', '90 graus']
+y.field_names = ['nome da imagem', 'Entropia', 'Contraste', 'Momento Angular']
 for index in constrastes:
     y.add_row(index)
 print(y)
