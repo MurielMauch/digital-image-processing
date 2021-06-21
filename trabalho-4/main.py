@@ -12,6 +12,13 @@ rgba = ['textura5', 'textura6', 'textura7', 'textura8']
 histogramas = []
 constrastes = []
 
+
+def normalize_image(imagem_monocromatica):
+    return cv2.normalize(imagem_monocromatica, None, alpha=imagem_entrada_min,
+                                                     beta=imagem_entrada_max, norm_type=cv2.NORM_MINMAX,
+                                                     dtype=cv2.DFT_COMPLEX_OUTPUT)
+
+
 for nome_imagem in imagens:
     imagem_entrada = io.imread(f'imagens/input/{nome_imagem}.png')
 
@@ -21,13 +28,11 @@ for nome_imagem in imagens:
     # transformando imagem em monocromatica e escrevendo em disco
     if nome_imagem not in rgba:
         imagem_monocromatica = color.rgb2gray(imagem_entrada)
+        imagem_monocromatica_normalizada = normalize_image(imagem_monocromatica)
+        io.imsave(f'imagens/output/{nome_imagem}-monocromatica.png', imagem_monocromatica_normalizada)
     else:
-        imagem_monocromatica = color.rgb2gray(color.rgba2rgb(imagem_entrada))
-
-    imagem_monocromatica_normalizada = cv2.normalize(imagem_monocromatica, None, alpha=imagem_entrada_min,
-                                                     beta=imagem_entrada_max, norm_type=cv2.NORM_MINMAX,
-                                                     dtype=cv2.DFT_COMPLEX_OUTPUT)
-    io.imsave(f'imagens/output/{nome_imagem}-monocromatica.png', imagem_monocromatica_normalizada)
+        # não precisamos converter nem normalizar apenas copiamos
+        imagem_monocromatica_normalizada = imagem_entrada
 
     # calculando lbp
     lbp = local_binary_pattern(imagem_monocromatica_normalizada, 8, 1)
@@ -41,7 +46,6 @@ for nome_imagem in imagens:
     plt.savefig(f'imagens/output/{nome_imagem}-histograma.png')
 
     # calculando a glcm
-    # 0 graus, 45 graus, 90 graus
     angulos = [0]
     props = ['dissimilarity', 'contrast', 'ASM']
     glcm = greycomatrix(img_as_ubyte(imagem_monocromatica_normalizada),
@@ -53,7 +57,7 @@ for nome_imagem in imagens:
     constrastes.append(aux)
     plt.clf()
 
-print('Contraste')
+print('Métricas')
 y = PrettyTable()
 y.field_names = ['nome da imagem', 'Entropia', 'Contraste', 'Momento Angular']
 for index in constrastes:
